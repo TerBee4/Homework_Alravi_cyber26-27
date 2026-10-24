@@ -1,6 +1,13 @@
+#pragma once
+
 #include <cstdint>
 #include <stdexcept>
 #include <map>
+#include <vector>
+
+#include "Dish.hpp"
+
+using Minutes = std::int64_t;
 
 
 class Cook {
@@ -83,14 +90,23 @@ class Storage {
         return store;
     }
 
-    void consumeIngredients(const Recipe& recipe) {
+    bool hasIngredients(const Recipe& recipe) const {
         for (const auto& [ingredient, grams] : recipe.getIngredients()) {
             if (!store.contains(ingredient)) {
-                throw std::logic_error("Ingredient is missing");
+                return false;
+                //throw std::logic_error("Ingredient is missing");
             }
             else if (store.at(ingredient) < grams) {
-                throw std::logic_error("Not enough ingredients at the storage");
+                return false;
+                //throw std::logic_error("Not enough ingredients at the storage");
             }
+        }
+        return true;
+    }
+
+    void consumeIngredients(const Recipe& recipe) {
+        if (!hasIngredients(recipe)) {
+            throw std::logic_error("Not enough ingredients at the storage");
         }
         for (const auto& [ingredient, grams] : recipe.getIngredients()) {
             store.at(ingredient) -= grams;
@@ -103,4 +119,80 @@ class Storage {
         store[ingredient] += grams;
     }
 
+};
+
+
+struct CookingTask {
+    Dish* dish;
+    Cook* cook;
+    Workplace* workplace;
+    Minutes finishTick;
+};
+
+
+class Kitchen {
+    private:
+    std::vector<CookingTask> activeTasks;
+    std::vector<Cook> cooks;
+    std::vector<Workplace> workplaces;
+    Storage storage;
+
+    public:
+    Kitchen(const std::vector<Cook>& cooks_, const std::vector<Workplace>& places_, const Storage& stor) : 
+    cooks(cooks_), workplaces(places_), storage(stor) {}
+
+    Cook* findFreeCook() {
+        for (auto& cook : cooks) {
+            if (!cook.isBusy()) {
+                return &cook;
+            }
+        }
+        return nullptr;
+    }
+
+    Workplace* findFreePlace() {
+    for (auto& place : workplaces) {
+        if (!place.isBusy()) {
+            return &place;
+        }
+    }
+    return nullptr;
+    }
+
+    bool TryStartCooking(Dish& dish, Minutes currentTick) {
+        if (dish.getStatus() != DishStatus::Waiting) {
+            throw std::logic_error("Dish must have status <Waiting>");
+        }
+        Cook* cook = findFreeCook();
+        Workplace* workplace = findFreePlace();
+        if (cook == nullptr || workplace == nullptr) {
+            return false;
+        }
+        if (!storage.hasIngredients(dish.getRecipe())) {
+            return false;
+        }
+
+        storage.consumeIngredients(dish.getRecipe());
+        cook->startCooking();
+        workplace->occupy();
+        dish.setStatus(DishStatus::Cooking);
+
+        Minutes finishTick = currentTick + dish.getRecipe().getCookingTime();
+        activeTasks.push_back({&dish, cook, workplace, finishTick});
+
+        return true;
+    }
+
+    void finishCooking(Minutes currentTick) {
+        for (std::size_t i = activeTasks.size(); i > 0; --i) {
+            auto& task = activeTasks[i-1];
+            if (task.finishTick <= currentTick) {
+                task.dish->setStatus(DishStatus::Ready);
+                task.cook->finishCooking();
+                task.workplace->release();
+
+                activeTasks.erase(activeTasks.begin() + (i - 1));
+            }
+        }
+    }
 };
