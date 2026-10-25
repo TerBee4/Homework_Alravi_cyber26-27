@@ -24,7 +24,7 @@ class Order {
     std::int64_t getOrderId() const {
         return id;
     }
-    const std::vector<Dish> getOrderDishes() const {
+    const std::vector<Dish>& getOrderDishes() const {
         return dishes;
     }
     bool isReady() const {
@@ -42,5 +42,9 @@ class Order {
         }
 
         dishes[index].setStatus(newstatus);
+    }
+
+    Dish& getDish(std::size_t index) {
+        return dishes.at(index);
     }
 };

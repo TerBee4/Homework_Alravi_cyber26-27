@@ -2,6 +2,7 @@
 
 #include "Order.hpp"
 #include "Kitchen.hpp"
+#include "Simulation.hpp"
 
 int main() {
     Recipe pizzaRecipe(
@@ -38,7 +39,7 @@ int main() {
         storage
     );
 
-    // Оба блюда начинаем готовить на тике 0
+
     std::cout << "Pizza started: "
               << kitchen.TryStartCooking(pizza, 0) << '\n';
 
@@ -64,6 +65,33 @@ int main() {
                       << (kitchen.findFreePlace() != nullptr) << '\n';
         }
     }
+
+    Simulation simulation(kitchen);
+
+    simulation.addOrder(Order(1, {pizza}));
+    simulation.addOrder(Order(2, {omelette}));
+
+    std::cout << "Orders count: " << simulation.getOrderCount() << '\n';
+
+    for (const auto& order : simulation.getViewOrders()) {
+        std::cout << "Order #" << order.getOrderId() << '\n';
+        for (const auto& dish : order.getOrderDishes()) {
+            std::cout << dish.getRecipe().getName() << ": " << static_cast<int>(dish.getStatus()) << '\n';
+        }
+    }
+
+
+    // std::cout << "\nSimulation tick: "
+    //       << simulation.getCurrentTick() << '\n';
+
+    // for (int i = 0; i < 7; ++i) {
+    //     simulation.nextTick();
+    // }
+
+    // std::cout << "Simulation tick: "
+    //       << simulation.getCurrentTick() << '\n';
+
+
     // Recipe pizza("Pizza", {
     //     {Ingredient::Flour, 200},
     //     {Ingredient::Tomato, 100},

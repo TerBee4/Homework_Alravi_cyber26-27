@@ -151,12 +151,12 @@ class Kitchen {
     }
 
     Workplace* findFreePlace() {
-    for (auto& place : workplaces) {
-        if (!place.isBusy()) {
-            return &place;
+        for (auto& place : workplaces) {
+            if (!place.isBusy()) {
+                return &place;
+            }
         }
-    }
-    return nullptr;
+        return nullptr;
     }
 
     bool TryStartCooking(Dish& dish, Minutes currentTick) {
