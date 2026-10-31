@@ -18,7 +18,7 @@ class Cook {
     public:
     Cook(std::int64_t id_) : id(id_) {
         if (id_ <= 0) {
-            throw std::invalid_argument("Cook Id must be > 0");
+            throw std::invalid_argument("ID повара должен быть положительным");
         }
     }
     std::int64_t getCookId() const {
@@ -29,13 +29,13 @@ class Cook {
     }
     void startCooking() {
         if (busy) {
-            throw std::logic_error("Cook is already busy");
+            throw std::logic_error("Повар уже занят");
         }
         busy = true;
     }
     void finishCooking() {
         if (!busy) {
-            throw std::logic_error("Cook is already free");
+            throw std::logic_error("Повар уже свободен");
         }
         busy = false;
     }
@@ -50,7 +50,7 @@ class Workplace {
     public:
     Workplace(std::int64_t id_) : id(id_) {
         if (id_ <= 0) {
-            throw std::invalid_argument("Workplace Id must be > 0");
+            throw std::invalid_argument("ID рабочего места должен быть положительным");
         }
     }
     std::int64_t getWorkplaceId() const {
@@ -61,13 +61,13 @@ class Workplace {
     }
     void occupy() {
         if (busy) {
-            throw std::logic_error("Workplace is already busy");
+            throw std::logic_error("Рабочее место уже занято");
         }
         busy = true;
     }
     void release() {
         if (!busy) {
-            throw std::logic_error("Workplace is already free");
+            throw std::logic_error("Рабочее место уже свободно");
         }
         busy = false;
     }
@@ -82,7 +82,7 @@ class Storage {
     Storage(const std::map<Ingredient, Grams>& store_) : store(store_) {
         for (const auto& [ingredient, grams]: store_) {
             if (grams < 0) {
-                throw std::invalid_argument("grams can not be < 0");
+                throw std::invalid_argument("Кол-во грамм не может быть отрицательным");
             }
         }
     }
@@ -94,11 +94,9 @@ class Storage {
         for (const auto& [ingredient, grams] : recipe.getIngredients()) {
             if (!store.contains(ingredient)) {
                 return false;
-                //throw std::logic_error("Ingredient is missing");
             }
             else if (store.at(ingredient) < grams) {
                 return false;
-                //throw std::logic_error("Not enough ingredients at the storage");
             }
         }
         return true;
@@ -106,7 +104,7 @@ class Storage {
 
     void consumeIngredients(const Recipe& recipe) {
         if (!hasIngredients(recipe)) {
-            throw std::logic_error("Not enough ingredients at the storage");
+            throw std::logic_error("Недостаточно ингредиентов на складе");
         }
         for (const auto& [ingredient, grams] : recipe.getIngredients()) {
             store.at(ingredient) -= grams;
@@ -114,7 +112,7 @@ class Storage {
     }
     void restock(Ingredient ingredient, Grams grams) {
         if (grams <= 0) {
-            throw std::invalid_argument("Grams amount must be > 0");
+            throw std::invalid_argument("Число грамм должно быть положительным");
         }
         store[ingredient] += grams;
     }
@@ -161,7 +159,7 @@ class Kitchen {
 
     bool TryStartCooking(Dish& dish, Minutes currentTick) {
         if (dish.getStatus() != DishStatus::Waiting) {
-            throw std::logic_error("Dish must have status <Waiting>");
+            throw std::logic_error("Блюдо должно иметь статус Waiting");
         }
         Cook* cook = findFreeCook();
         Workplace* workplace = findFreePlace();
@@ -194,5 +192,9 @@ class Kitchen {
                 activeTasks.erase(activeTasks.begin() + (i - 1));
             }
         }
+    }
+
+    void restock(Ingredient ingredient, Grams grams) {
+        storage.restock(ingredient, grams);
     }
 };

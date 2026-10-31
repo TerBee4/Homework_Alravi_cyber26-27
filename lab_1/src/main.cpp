@@ -5,80 +5,132 @@
 #include "Simulation.hpp"
 
 int main() {
-    Recipe pizzaRecipe(
-        "Pizza",
-        {{Ingredient::Flour, 200},
-         {Ingredient::Tomato, 100},
-         {Ingredient::Cheese, 100}},
-        15
-    );
-
-    Recipe omeletteRecipe(
-        "Omelette",
-        {{Ingredient::Egg, 150},
-         {Ingredient::Milk, 70},
-         {Ingredient::Bread, 50}},
-        7
-    );
-
-    Dish pizza(pizzaRecipe);
-    Dish omelette(omeletteRecipe);
-
-    Storage storage({
+    std::vector<Recipe> menu = {
+    Recipe("Pizza", {
         {Ingredient::Flour, 200},
         {Ingredient::Tomato, 100},
-        {Ingredient::Cheese, 100},
+        {Ingredient::Cheese, 100}
+    }, 8),
+
+    Recipe("Omelette", {
         {Ingredient::Egg, 150},
-        {Ingredient::Milk, 70},
-        {Ingredient::Bread, 50}
-    });
+        {Ingredient::Milk, 50}
+    }, 4),
 
-    Kitchen kitchen(
-        {Cook(1), Cook(2)},
-        {Workplace(1), Workplace(2)},
-        storage
-    );
+    Recipe("Salad", {
+        {Ingredient::Cucumber, 100},
+        {Ingredient::Tomato, 100},
+        {Ingredient::Greens, 100}
+    }, 2),
 
+    Recipe("Burger", {
+        {Ingredient::Bread, 100},
+        {Ingredient::Meat, 150},
+        {Ingredient::Tomato, 50},
+        {Ingredient::Cheese, 50}
+    }, 7),
 
-    std::cout << "Pizza started: "
-              << kitchen.TryStartCooking(pizza, 0) << '\n';
+    Recipe("Fish strips", {
+        {Ingredient::Fish, 200},
+        {Ingredient::Bread, 250}
+    }, 4),
 
-    std::cout << "Omelette started: "
-              << kitchen.TryStartCooking(omelette, 0) << '\n';
+    Recipe("Pinakolada", {
+        {Ingredient::Sugar, 30},
+        {Ingredient::Milk, 150}
+    }, 3),
 
-    for (Minutes tick = 0; tick <= 15; ++tick) {
-        kitchen.finishCooking(tick);
+    Recipe("Cheesecake", {
+        {Ingredient::CreamCheese, 150},
+        {Ingredient::Sugar, 50},
+        {Ingredient::Milk, 50}
+    }, 10)
+    };
 
-        if (tick == 0 || tick == 7 || tick == 15) {
-            std::cout << "\nTick: " << tick << '\n';
+    Storage storage({
+        {Ingredient::Bread, 1000}, {Ingredient::Tomato, 1000}, {Ingredient::Cheese, 1000},
+        {Ingredient::Egg, 1000}, {Ingredient::Milk, 1000}, {Ingredient::Cucumber, 1000},
+        {Ingredient::Greens, 1000}, {Ingredient::Meat, 1000}, {Ingredient::Flour, 1000},
+        {Ingredient::Fish, 1000}, {Ingredient::Sugar, 1000}, {Ingredient::CreamCheese, 1000}
+        });
+    Kitchen kitchen({Cook(1), Cook(2), Cook(3)}, {Workplace(1), Workplace(2)}, storage);
+    Simulation sim(kitchen);
+    OrderGenerator generator(67, 0.2, menu);
+    sim.setOrderGenerator(generator);
 
-            std::cout << "Pizza status: "
-                      << static_cast<int>(pizza.getStatus()) << '\n';
+    for (std::int64_t i = 0; i < 30; i++) {
+        sim.nextTick();
+        std::cout << "\n===== Тик " << sim.getCurrentTick() << " =====\n";
+        std::cout << "Всего заказов: " << sim.getOrderCount() << '\n';
 
-            std::cout << "Omelette status: "
-                      << static_cast<int>(omelette.getStatus()) << '\n';
+        for (const Order& order : sim.getViewOrders()) {
+            std::cout << '\n' << "Заказ № " << order.getOrderId() << " дедлайн : " << order.getDeadline() << '\n';
 
-            std::cout << "Free cook: "
-                      << (kitchen.findFreeCook() != nullptr) << '\n';
+            for (const Dish& dish : order.getOrderDishes()) {
+                std::cout << "Блюдо " << dish.getRecipe().getName() << " - ";
 
-            std::cout << "Free workplace: "
-                      << (kitchen.findFreePlace() != nullptr) << '\n';
+                switch (dish.getStatus()) {
+                    case DishStatus::Waiting:
+                        std::cout << "Ожидает";
+                        break;
+
+                    case DishStatus::Cooking:
+                        std::cout << "Готовится";
+                        break;
+
+                    case DishStatus::Ready:
+                        std::cout << "Готово";
+                        break;
+                }
+                std::cout << '\n';
+            }
+            if (order.isReady()) {
+                std::cout << "  Заказ выполнен!\n";
+            }
         }
     }
 
-    Simulation simulation(kitchen);
+    // std::cout << "Pizza started: "
+    //           << kitchen.TryStartCooking(pizza, 0) << '\n';
 
-    simulation.addOrder(Order(1, {pizza}));
-    simulation.addOrder(Order(2, {omelette}));
+    // std::cout << "Omelette started: "
+    //           << kitchen.TryStartCooking(omelette, 0) << '\n';
 
-    std::cout << "Orders count: " << simulation.getOrderCount() << '\n';
+    // for (Minutes tick = 0; tick <= 15; ++tick) {
+    //     kitchen.finishCooking(tick);
 
-    for (const auto& order : simulation.getViewOrders()) {
-        std::cout << "Order #" << order.getOrderId() << '\n';
-        for (const auto& dish : order.getOrderDishes()) {
-            std::cout << dish.getRecipe().getName() << ": " << static_cast<int>(dish.getStatus()) << '\n';
-        }
-    }
+    //     if (tick == 0 || tick == 7 || tick == 15) {
+    //         std::cout << "\nTick: " << tick << '\n';
+
+    //         std::cout << "Pizza status: "
+    //                   << static_cast<int>(pizza.getStatus()) << '\n';
+
+    //         std::cout << "Omelette status: "
+    //                   << static_cast<int>(omelette.getStatus()) << '\n';
+
+    //         std::cout << "Free cook: "
+    //                   << (kitchen.findFreeCook() != nullptr) << '\n';
+
+    //         std::cout << "Free workplace: "
+    //                   << (kitchen.findFreePlace() != nullptr) << '\n';
+    //     }
+    // }
+
+    // Simulation simulation(kitchen);
+
+    // simulation.addOrder(Order(1, {pizza}, 20));
+    // simulation.addOrder(Order(2, {omelette}, 10));
+    // simulation.setScheduler(SchedulingPolicy::EDF);
+    // simulation.nextTick();
+
+    // std::cout << "Orders count: " << simulation.getOrderCount() << '\n';
+
+    // for (const auto& order : simulation.getViewOrders()) {
+    //     std::cout << "Order #" << order.getOrderId() << '\n';
+    //     for (const auto& dish : order.getOrderDishes()) {
+    //         std::cout << dish.getRecipe().getName() << ": " << static_cast<int>(dish.getStatus()) << '\n';
+    //     }
+    // }
 
 
     // std::cout << "\nSimulation tick: "

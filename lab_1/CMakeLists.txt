@@ -30,6 +30,7 @@ if(BUILD_TESTING)
         tests/test_dish.cpp
         tests/test_order.cpp
         tests/test_kitchen.cpp
+        tests/test_simulation.cpp
     )
 
     target_include_directories(restaurant_tests PRIVATE

@@ -38,19 +38,20 @@ class Recipe {
         std::int64_t cookingTime;
 
     public:
-        Recipe(std::string n, const std::map<Ingredient, Grams>& ing, std::int64_t cookTime) : name(n), ingredients(ing), cookingTime(cookTime) {
+        Recipe(std::string n, const std::map<Ingredient, Grams>& ing, std::int64_t cookTime) : 
+        name(n), ingredients(ing), cookingTime(cookTime) {
             if (n.empty()) {
-                throw std::invalid_argument("Recipe name can not be empty");
+                throw std::invalid_argument("Название рецепта не может быть пустым");
             }
             if (ing.empty()) {
-                throw std::invalid_argument("Recipe can not be empty");
+                throw std::invalid_argument("Рецепт не может быть пустым");
             }
             if (cookTime <= 0) {
-                throw std::invalid_argument("CookingTime must be > 0");
+                throw std::invalid_argument("Времы приготовления должно быть положительным");
             }
             for (const auto& [ingredient_, grams] : ing) {
                 if (grams <= 0) {
-                    throw std::invalid_argument("Ingredient mass must be > 0");
+                    throw std::invalid_argument("Масса ингредиентов должна быть положительной");
                 }
             }
         }
@@ -89,7 +90,7 @@ class Dish {
             status = newStatus;
         }
         else {
-            throw std::logic_error("Invalid dish status transition");
+            throw std::logic_error("Неверное переназначение статуса блюда");
         }
     }
 };
