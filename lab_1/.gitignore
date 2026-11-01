@@ -1,0 +1,11 @@
+build/
+build-coverage/
+
+*.gcda
+*.gcno
+*.gcov
+
+journal.txt
+statistics.csv
+test_journal.txt
+test_statistics.csv

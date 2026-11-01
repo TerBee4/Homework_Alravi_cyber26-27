@@ -30,7 +30,7 @@ class OrderGenerator {
     }
 
     Order generateOrder(Minutes currentTick, std::int64_t OrderId) {
-        std::uniform_int_distribution<int> amountDistribution(1, 3);
+        std::uniform_int_distribution<int> amountDistribution(1, 5);
         int dishCount = amountDistribution(generator);
 
         std::vector<Dish> dishes;

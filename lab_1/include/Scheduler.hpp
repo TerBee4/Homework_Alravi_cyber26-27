@@ -30,6 +30,8 @@ class Scheduler {
                 return orders[a].getDeadline() < orders[b].getDeadline();});
         }
         return indeces;
-
+    }
+    SchedulingPolicy getPolicy() const {
+        return policy;
     }
 };

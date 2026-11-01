@@ -31,6 +31,9 @@ if(BUILD_TESTING)
         tests/test_order.cpp
         tests/test_kitchen.cpp
         tests/test_simulation.cpp
+        tests/test_generator.cpp
+        tests/test_journal.cpp
+        tests/test_statistics.cpp
     )
 
     target_include_directories(restaurant_tests PRIVATE

@@ -197,4 +197,18 @@ class Kitchen {
     void restock(Ingredient ingredient, Grams grams) {
         storage.restock(ingredient, grams);
     }
+
+    double getCookUtilization() const {
+        if (cooks.empty()) {
+            return 0.0;
+        }
+        return static_cast<double>(activeTasks.size()) / cooks.size() * 100.0;
+    }
+
+    double getWorkPlaceUtilization() const {
+        if (workplaces.empty()) {
+            return 0.0;
+        }
+        return static_cast<double>(activeTasks.size()) / workplaces.size() * 100.0;
+    }
 };

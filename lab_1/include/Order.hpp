@@ -8,6 +8,12 @@
 
 #include "Dish.hpp"
 
+enum class OrderStatus {
+    Waiting,
+    Cooking,
+    Ready
+};
+
 
 class Order {
     private:
@@ -44,6 +50,18 @@ class Order {
             }
         }
         return true;
+    }
+
+    OrderStatus getStatus() const {
+        if (isReady()) {
+            return OrderStatus::Ready;
+        }
+        for (const Dish& dish : dishes) {
+            if (dish.getStatus() != DishStatus::Waiting) {
+                return OrderStatus::Cooking;    
+            }
+        }
+        return OrderStatus::Waiting;
     }
 
     void SetDishStatus(std::size_t index, DishStatus newstatus) {
