@@ -63,12 +63,11 @@ class Order {
         }
         return OrderStatus::Waiting;
     }
-
+    //засунуть в приват и вызывать по другому публичными функциями
     void SetDishStatus(std::size_t index, DishStatus newstatus) {
         if (index >= dishes.size()) {
             throw std::out_of_range("Неверный индекс блюда");
         }
-
         dishes[index].setStatus(newstatus);
     }
 

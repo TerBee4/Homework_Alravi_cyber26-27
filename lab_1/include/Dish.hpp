@@ -30,6 +30,7 @@ enum class DishStatus {
 };
 
 using Grams = std::int64_t;
+using Minutes = std::int64_t;
 
 class Recipe {
     private:
@@ -82,6 +83,7 @@ class Dish {
     DishStatus getStatus() const {
         return status;
     }
+    // без явного setStatus, переходы сами по себе
     void setStatus(DishStatus newStatus) {
         if (status == DishStatus::Waiting && newStatus == DishStatus::Cooking) {
             status = newStatus;
