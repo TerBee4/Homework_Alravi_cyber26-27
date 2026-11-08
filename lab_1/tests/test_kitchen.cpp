@@ -216,8 +216,8 @@ TEST(KitchenTest, TryStartReadyDish) {
     Recipe recipe("Pinakolada", {{Ingredient::Milk, 100}}, 10);
     Dish coctail(recipe);
 
-    coctail.setStatus(DishStatus::Cooking);
-    coctail.setStatus(DishStatus::Ready);
+    coctail.startCooking();
+    coctail.finishCooking();
 
     EXPECT_THROW(kitchen.TryStartCooking(coctail, 0), std::logic_error);
 }

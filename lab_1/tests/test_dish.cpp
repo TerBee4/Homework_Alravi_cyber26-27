@@ -49,11 +49,10 @@ TEST(DishTest, settingStatus) {
     Dish dish(recipe);
 
     EXPECT_EQ(dish.getStatus(), DishStatus::Waiting);
-    dish.setStatus(DishStatus::Cooking);
+    dish.startCooking();
     EXPECT_EQ(dish.getStatus(), DishStatus::Cooking);
-    dish.setStatus(DishStatus::Ready);
+    dish.finishCooking();
     EXPECT_EQ(dish.getStatus(), DishStatus::Ready);
-    
 }
 
 TEST(DishTest, CannotSkipCooking) {
@@ -69,7 +68,7 @@ TEST(DishTest, CannotSkipCooking) {
 
     Dish dish(recipe);
 
-    EXPECT_THROW(dish.setStatus(DishStatus::Ready), std::logic_error);
+    EXPECT_THROW(dish.finishCooking(), std::logic_error);
     EXPECT_EQ(dish.getStatus(), DishStatus::Waiting);
 }
 
@@ -85,12 +84,12 @@ TEST(DishTest, BackToWaiting) {
     );
 
     Dish dish(recipe);
-    dish.setStatus(DishStatus::Cooking);
+    dish.startCooking();
 
-    EXPECT_THROW(dish.setStatus(DishStatus::Waiting), std::logic_error);
+    EXPECT_THROW(dish.startCooking(), std::logic_error);
     EXPECT_EQ(dish.getStatus(), DishStatus::Cooking);
-    dish.setStatus(DishStatus::Ready);
-    EXPECT_THROW(dish.setStatus(DishStatus::Waiting), std::logic_error);
+    dish.finishCooking();
+    EXPECT_THROW(dish.startCooking(), std::logic_error);
     EXPECT_EQ(dish.getStatus(), DishStatus::Ready);
 }
 

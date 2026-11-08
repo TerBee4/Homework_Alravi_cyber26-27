@@ -45,14 +45,14 @@ TEST(OrderTest, IsOrderReady) {
     Dish salat(recipe2);
     Order order(1, {pizza, salat});
 
-    order.SetDishStatus(0, DishStatus::Cooking);
+    order.getDish(0).startCooking();
     EXPECT_FALSE(order.isReady());
-    EXPECT_THROW(order.SetDishStatus(1, DishStatus::Ready), std::logic_error);
-    order.SetDishStatus(1, DishStatus::Cooking);
+    EXPECT_THROW(order.getDish(1).finishCooking(), std::logic_error);
+    order.getDish(1).startCooking();
     EXPECT_FALSE(order.isReady());
-    order.SetDishStatus(0, DishStatus::Ready);
+    order.getDish(0).finishCooking();
     EXPECT_FALSE(order.isReady());
-    order.SetDishStatus(1, DishStatus::Ready);
+    order.getDish(1).finishCooking();
     EXPECT_TRUE(order.isReady());
 }
 
@@ -84,7 +84,7 @@ TEST(OrderTest, WrongDishOrder) {
     Dish pizza(recipe);
     Order order(1, {pizza});
 
-    EXPECT_THROW(order.SetDishStatus(1, DishStatus::Cooking), std::out_of_range);
+    EXPECT_THROW(order.getDish(1).startCooking(), std::out_of_range);
     EXPECT_EQ(order.getDish(0).getStatus(), DishStatus::Waiting);
     EXPECT_THROW(order.getDish(67), std::out_of_range);
 }

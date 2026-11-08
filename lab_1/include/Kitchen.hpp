@@ -173,7 +173,7 @@ class Kitchen {
         storage.consumeIngredients(dish.getRecipe());
         cook->startCooking();
         workplace->occupy();
-        dish.setStatus(DishStatus::Cooking);
+        dish.startCooking();
 
         Minutes finishTick = currentTick + dish.getRecipe().getCookingTime();
         activeTasks.push_back({&dish, cook, workplace, finishTick});
@@ -185,7 +185,7 @@ class Kitchen {
         for (std::size_t i = activeTasks.size(); i > 0; --i) {
             auto& task = activeTasks[i-1];
             if (task.finishTick <= currentTick) {
-                task.dish->setStatus(DishStatus::Ready);
+                task.dish->finishCooking();
                 task.cook->finishCooking();
                 task.workplace->release();
 

@@ -83,16 +83,18 @@ class Dish {
     DishStatus getStatus() const {
         return status;
     }
-    // без явного setStatus, переходы сами по себе
-    void setStatus(DishStatus newStatus) {
-        if (status == DishStatus::Waiting && newStatus == DishStatus::Cooking) {
-            status = newStatus;
+
+    void startCooking() {
+        if (status == DishStatus::Waiting) {
+            status = DishStatus::Cooking;
         }
-        else if (status == DishStatus::Cooking && newStatus == DishStatus::Ready) {
-            status = newStatus;
+        else throw std::logic_error("Блюдо нельзя начать готовить");
+    }
+
+    void finishCooking() {
+        if (status == DishStatus::Cooking) {
+            status = DishStatus::Ready;
         }
-        else {
-            throw std::logic_error("Неверное переназначение статуса блюда");
-        }
+        else throw std::logic_error("Блюдо не находится в процессе приготовления");   
     }
 };
